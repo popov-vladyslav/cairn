@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "cairn",
+  "description": "Cairn — lightweight AI-native build loop.",
+  "owner": { "name": "Vlad" },
+  "plugins": [
+    {
+      "name": "cairn",
+      "source": "./",
+      "description": "Spec -> Challenge -> Plan -> Implement -> Review -> Complete. Durable specs + decisions as repo memory; a mandatory Challenge gate before planning.",
+      "category": "development"
+    }
+  ]
+}
