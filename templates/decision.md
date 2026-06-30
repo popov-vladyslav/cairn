@@ -1,3 +1,11 @@
+---
+project: <project>
+type: decision
+slug: <slug>
+tags: []
+status: accepted
+date: YYYY-MM-DD
+---
 # NNNN — <decision in one line>
 
 Date: YYYY-MM-DD   Status: accepted | superseded by NNNN

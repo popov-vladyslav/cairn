@@ -1,3 +1,11 @@
+---
+project: <project>
+type: spec
+slug: <slug>
+tags: []
+status: draft
+date: YYYY-MM-DD
+---
 # <Feature name>
 
 > Request (verbatim): "<paste the user's actual ask>"

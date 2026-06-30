@@ -1,16 +1,21 @@
 ---
-description: "Turn a request into a spec (problem, goal, non-goals, acceptance criteria). No solution yet."
+description: "Turn a request into a spec (problem, goal, non-goals, acceptance criteria) saved to memory. No solution yet."
 argument-hint: "<feature-slug> [the request]"
 ---
 
 The feature and request: **$ARGUMENTS**
 
-You are running the **Spec** stage of the Cairn loop.
+You are running the **Spec** stage of the Cairn loop. Specs live in the **central memory store**, not this repo.
 
-1. **Scaffold if needed.** If `specs/` or `decisions/` don't exist, create them. For `AGENTS.md` at the repo root: if none exists, copy `${CLAUDE_PLUGIN_ROOT}/templates/AGENTS.md` so other agents (Codex, Gemini) inherit the same rules. If one exists but doesn't mention Cairn, append the loop + rules from that template under a `## Cairn` heading rather than overwriting it. If it already mentions Cairn, leave it untouched.
-2. **Capture the request verbatim** at the top of the spec.
-3. **Write `specs/<feature-slug>.md`** from `${CLAUDE_PLUGIN_ROOT}/templates/spec.md`. Fill in: Problem, Goal, Non-goals, Acceptance criteria (observable, individually testable). Delete any section that adds no information for this feature.
-4. **Write no solution and no plan.** That comes later.
-5. If the request is too vague to state testable acceptance criteria, ask **one** sharp clarifying question instead of guessing.
+**Resolve paths.** `<project>` = this repo's folder name (e.g. `renderers`). `<memory>` = the `Memory:` path in this repo's `AGENTS.md` if set; otherwise default to `${CLAUDE_PLUGIN_ROOT}/memory` (the cairn repo's store — if Cairn runs from a copied plugin rather than a directory source, set `Memory:` to your cairn repo's `memory/` so entries persist and version). The project's store is `<memory>/<project>/`.
 
-End by showing the spec and instructing: run `/cairn:challenge <feature-slug>` next.
+1. **Scaffold.** Ensure `<memory>/<project>/{specs,decisions,learnings}/` exist; create them if not. Then handle `AGENTS.md` at the repo root:
+   - none → copy `${CLAUDE_PLUGIN_ROOT}/templates/AGENTS.md` and fill its `Memory:` line with the absolute `<memory>/<project>` path.
+   - exists, no Cairn → append the loop + rules from that template under a `## Cairn` heading (include the `Memory:` line); don't overwrite.
+   - already Cairn → leave it untouched.
+2. **Recall first.** Before drafting, search the memory store for prior work — `/cairn:recall` over `<memory>` (this project first, then others) on the tags/keywords you infer from the request. Summarize any prior spec/decision/learning you'll reuse, and link it under Constraints / links.
+3. **Draft** from `${CLAUDE_PLUGIN_ROOT}/templates/spec.md`: capture the request verbatim at the top; fill Problem, Goal, Non-goals, Acceptance criteria (observable, individually testable), and the frontmatter (`project`, `type: spec`, `slug`, `tags`, `status: draft`, `date`). Delete any section that adds no information. **Write no solution and no plan** — that comes later.
+4. If the request is too vague to state testable acceptance criteria, ask **one** sharp clarifying question instead of guessing.
+5. **Approval gate.** Show the drafted spec + proposed tags and ask with AskUserQuestion to confirm it's accurate and the tags are right. Only on approval, write it to `<memory>/<project>/specs/<feature-slug>.md`.
+
+End by showing the saved spec path and instructing: run `/cairn:challenge <feature-slug>` next.

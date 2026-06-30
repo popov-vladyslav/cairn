@@ -5,28 +5,43 @@ Cairn is a declarative Claude Code plugin: all behavior lives in markdown
 
 ## Layout
 
-- `commands/*.md` — the slash commands (`/cairn:spec`, `:challenge`, `:plan`, `:next`, `:review`, `:decide`). Each is a prompt with YAML frontmatter (`description`, `argument-hint`).
+- `commands/*.md` — the slash commands (`/cairn:spec`, `:challenge`, `:plan`, `:next`, `:review`, `:decide`, `:learn`, `:recall`). Each is a prompt with YAML frontmatter (`description`, `argument-hint`).
 - `skills/rules/SKILL.md` — the operating manual that auto-loads in a Cairn repo.
-- `templates/*.md` — scaffolding copied into user repos (`spec.md`, `plan.md`, `decision.md`, `AGENTS.md`).
+- `templates/*.md` — scaffolding copied into user repos (`spec.md`, `plan.md`, `decision.md`, `learning.md`, `AGENTS.md`).
+- `memory/` — the central knowledge store, one folder per project. `memory/README.md` is a maintainer doc; project content (specs, decisions, learnings) is written here at runtime by the commands.
 - `.claude-plugin/` — `plugin.json` (the plugin manifest) and `marketplace.json` (single-plugin marketplace).
 
 ## Maintenance invariants
 
 - **Keep `templates/AGENTS.md` and `skills/rules/SKILL.md` in sync.** They intentionally
-  carry the same loop and the same coding / review / confidence / blast-radius rules — one for
-  external agents (Codex, Gemini) via the copied `AGENTS.md`, one for Claude Code via the skill.
-  When you change a rule, change it in **both**. Treat `SKILL.md` as the source of truth.
+  carry the same loop and the same `## Delegation & coding rules`, review, confidence, blast-radius,
+  and `## Memory` sections — one for external agents (Codex, Gemini) via the copied `AGENTS.md`,
+  one for Claude Code via the skill. When you change a rule, change it in **both**. Treat `SKILL.md`
+  as the source of truth.
 - **Keep the stage hand-offs consistent.** Every command ends by naming the next command, and
   several reference shared conventions that must agree across files:
   - A Challenge is *resolved* only when its `Recommendation:` line reads `proceed`
     (`challenge.md` defines it; `plan.md` gates on it).
   - The plan lives in the `## Plan` section of the spec (small/medium) **or** a sibling
-    `specs/<slug>.plan.md` (large). `plan.md` writes it; `next.md` and `review.md` both read it;
-    `review.md` prunes it. Change one, check all four.
+    `<memory>/<project>/specs/<slug>.plan.md` (large). `plan.md` writes it; `next.md` and `review.md`
+    both read it; `review.md` prunes it. Change one, check all four.
+  - **Memory paths agree.** Every command resolves `<memory>` = the `Memory:` line in the repo's
+    `AGENTS.md` (set by `/cairn:spec`) and `<project>` = the repo folder name. Keep that convention
+    identical across `spec/challenge/plan/next/review/decide/learn/recall`.
+  - **Writes are approval-gated; reads aren't.** `spec`, `decide`, and `learn` must AskUserQuestion
+    before writing to memory; `recall` — and the automatic recall in `spec`/`challenge` — is read-only.
+- **Memory-path gotcha.** Memory is *data* and must live in the Cairn git repo so it versions and
+  persists. `/cairn:spec` defaults `<memory>` to `${CLAUDE_PLUGIN_ROOT}/memory` — correct for a
+  *directory-source* install (the plugin root **is** the repo), but a copied/GitHub install makes
+  `${CLAUDE_PLUGIN_ROOT}` a throwaway copy. For those, set the `Memory:` line to your cairn repo's
+  `memory/<project>` path.
 - **Don't put maintainer notes in `templates/`** — those files are copied verbatim into user repos.
+  (`memory/README.md` is a maintainer doc and is *not* copied anywhere.)
 
 ## Before publishing
 
 - Run `claude plugin validate --strict` to catch manifest typos.
 - Smoke-test locally with `claude --plugin-dir /absolute/path/to/cairn`, then run the loop end to end
-  (`/cairn:spec` → `:challenge` → `:plan` → `:next` → `:review`) in a throwaway repo.
+  (`/cairn:spec` → `:challenge` → `:plan` → `:next` → `:review` → `:learn`, with `/cairn:recall` to
+  confirm the entry is found) in a throwaway repo, and confirm no memory write happens without an
+  approval prompt.

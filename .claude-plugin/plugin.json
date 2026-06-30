@@ -1,8 +1,8 @@
 {
   "name": "cairn",
-  "version": "0.1.0",
-  "description": "A lightweight, AI-native build loop for coding agents: Spec -> Challenge -> Plan -> Implement -> Review -> Complete. Specs and decisions are durable repo memory; plans are disposable. The mandatory Challenge gate makes the agent interrogate the request before planning.",
+  "version": "0.2.0",
+  "description": "A lightweight, AI-native build loop for coding agents: Spec -> Challenge -> Plan -> Implement -> Review -> Complete. Specs, decisions, and learnings live in a central, tagged memory store reused across projects; plans are disposable. Teach-first with subagents; the mandatory Challenge gate makes the agent interrogate the request before planning.",
   "author": { "name": "Vlad Popov" },
   "license": "MIT",
-  "keywords": ["spec-driven", "workflow", "agents", "challenge", "decision-records", "context", "claude-code"]
+  "keywords": ["spec-driven", "workflow", "agents", "challenge", "decision-records", "context", "claude-code", "memory", "knowledge-base", "subagents", "teaching"]
 }
