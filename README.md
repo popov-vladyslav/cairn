@@ -10,8 +10,6 @@ Specs, decisions, and learnings are **durable memory**; plans are **disposable**
 
 Cairn is **teach-first**: by default the agent hands you a precise instruction (what / where / why + example) and reviews what you build; it writes code itself only for obvious small pieces you approve, delegating those — and independent review — to subagents with strict, minimal briefs.
 
-Distilled from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (phased lifecycle, slash commands, blast-radius/confidence discipline, reuse-don't-reinvent) and [genkovich/sdd](https://github.com/genkovich/sdd) (specs as artifacts each stage reads, gating, decision records, acceptance-criteria traceability) — minus the 24-skill / 16-stage weight. The **Challenge** gate is the addition neither has as a first-class step.
-
 ## Install
 
 **From GitHub (recommended):**
