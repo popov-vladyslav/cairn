@@ -4,6 +4,5 @@
 # Local Claude Code settings
 .claude/
 
-# Project memory is private by default: every memory/<project>/ folder is ignored.
-# To version your own memory, delete the next line in your clone (or point Memory: at a private repo).
+# Project memory stays local: every memory/<project>/ folder is ignored; only memory/README.md is tracked.
 memory/*/

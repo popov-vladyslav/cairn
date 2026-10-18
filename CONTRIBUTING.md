@@ -46,10 +46,9 @@ Cairn is a declarative Claude Code plugin: all behavior lives in markdown
   *directory-source* install (the plugin root **is** the repo), but a copied/GitHub install makes
   `${CLAUDE_PLUGIN_ROOT}` a throwaway copy. For those, set the `Memory:` line to your cairn clone's
   `memory/<project>` path.
-- **Project memory is private by default.** `.gitignore` ignores every `memory/<project>/` folder, so a
-  public clone of this repo never ships anyone's specs. Only `memory/README.md` is tracked. To version
-  your own memory, remove the `memory/*/` line in your clone (or keep it and point `Memory:` at a
-  private repo). Never commit a `memory/<project>/` folder to the public repo.
+- **Project memory stays local.** `.gitignore` ignores every `memory/<project>/` folder, so this repo
+  never ships anyone's specs. Only `memory/README.md` is tracked. Never commit a `memory/<project>/`
+  folder.
 - **Don't put maintainer notes in `templates/`** — those files are copied verbatim into user repos.
   (`memory/README.md` is a maintainer doc and is *not* copied anywhere.)
 

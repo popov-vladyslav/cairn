@@ -66,6 +66,6 @@ Only `/cairn:spec` (→ `draft`), `/cairn:plan` (→ `active`) and `/cairn:revie
 - **Write** (approval-gated): `/cairn:spec`, `/cairn:decide`, and `/cairn:learn` each show the drafted entry + tags and ask before saving. Nothing lands here without approval.
 - **Recall** (manual): `/cairn:recall <query | #tag> [project]` — matching rule slugs are printed first.
 
-## Versioning and privacy
+## Versioning
 
-Project folders (`memory/<project>/`) are **gitignored by default**, so a public clone of Cairn never carries anyone's specs — only this README is tracked. To version your own memory, delete the `memory/*/` line from `.gitignore` in your clone, or point each project's `Memory:` line at a folder inside a private repo. Whether the agent commits memory writes itself is set per project by the `Git:` line in its `AGENTS.md` (`agent` commits; `owner` means the agent reminds the owner to commit `memory/`).
+Project folders (`memory/<project>/`) are **gitignored** and stay on your machine — only this README is tracked, so the Cairn repo never carries anyone's specs. Whether the agent commits memory writes itself is set per project by the `Git:` line in its `AGENTS.md` (`agent` commits; `owner` means the agent reminds the owner to commit `memory/`).

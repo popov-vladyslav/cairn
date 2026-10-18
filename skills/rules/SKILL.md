@@ -74,4 +74,4 @@ Cairn's durable memory is **central**, not per-repo. Specs, decisions, and learn
 - **Learn at Complete.** When work finishes, distill what's reusable — the approach that worked, gotchas, patterns — into `learnings/` (`/cairn:learn`). That is how memory gets smarter per job.
 - Plans are disposable; specs/decisions/learnings are durable. When implementation reveals the spec was wrong, update the spec in the same change. Chat deliberation and restated code aren't memory — only durable, reusable artifacts belong here.
 
-The memory store lives in your Cairn clone (project folders under `memory/` are gitignored by default — remove that ignore, or point `Memory:` at a private repo, to version them) and is found via the absolute `Memory:` path in each project's `AGENTS.md`.
+The memory store lives in your Cairn clone (project folders under `memory/` are gitignored and stay local) and is found via the absolute `Memory:` path in each project's `AGENTS.md`.
