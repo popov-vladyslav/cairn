@@ -12,9 +12,16 @@ Cairn is **teach-first**: by default the agent hands you a precise instruction (
 
 Distilled from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (phased lifecycle, slash commands, blast-radius/confidence discipline, reuse-don't-reinvent) and [genkovich/sdd](https://github.com/genkovich/sdd) (specs as artifacts each stage reads, gating, decision records, acceptance-criteria traceability) — minus the 24-skill / 16-stage weight. The **Challenge** gate is the addition neither has as a first-class step.
 
-## Install (local)
+## Install
 
-**Option A — no marketplace, simplest:**
+**From GitHub (recommended):**
+```text
+/plugin marketplace add popov-vladyslav/cairn
+/plugin install cairn@cairn
+```
+Then set the `Memory:` line in each project's `AGENTS.md` to a `memory/<project>` folder in a repo you control (an installed plugin's own folder is a throwaway copy — see `CONTRIBUTING.md`).
+
+**Option A — local checkout, no marketplace:**
 ```bash
 claude --plugin-dir /absolute/path/to/cairn
 ```
