@@ -4,6 +4,10 @@ You are a coding agent. Read this file, then the relevant spec and decisions in 
 Cairn **memory store** (see `## Memory`) before touching code. Follow the loop. Don't skip Challenge.
 
 Memory: `<absolute path to <cairn>/memory/<project> — filled by /cairn:spec>`
+Mode: teach-first (teach-first | agent-implements)
+Git: agent (agent | owner — who commits code)
+Gates: (optional; one per line: "<step kind> -> <condition that must be confirmed before such a step starts>")
+Verify: (optional; one per line: "<criterion scope> -> <evidence that proves it>")
 
 ## Loop
 Request -> Spec -> Challenge -> Plan -> Implement -> Review -> Complete
@@ -14,6 +18,7 @@ Request -> Spec -> Challenge -> Plan -> Implement -> Review -> Complete
 Commands (Claude Code): /cairn:spec  /cairn:challenge  /cairn:plan  /cairn:next  /cairn:review  /cairn:decide
 
 ## Delegation & coding rules
+Project settings: the `Mode:`, `Git:`, `Gates:` and `Verify:` lines under `Memory:` above override the defaults below. `Mode: agent-implements` lets the agent implement plan steps directly; `Git: owner` means the agent never commits (it lists changed files + a suggested message); `Gates:` names step kinds that need a confirmed condition before they start; `Verify:` names the evidence that proves each criterion scope at Review. An absent key means the default (teach-first, agent commits, no gates, evidence = test / behaviour / file).
 - Teach first: default output is an instruction (what / where / why + copy-paste example), not a commit. You implement; the agent reviews.
 - Small pieces only. Split into the smallest green steps.
 - Obvious small piece -> ask (AskUserQuestion); only after approval may a subagent write it.
@@ -44,7 +49,8 @@ Commands (Claude Code): /cairn:spec  /cairn:challenge  /cairn:plan  /cairn:next 
 - Bigger blast radius => more challenge, smaller steps, slower commits.
 
 ## Memory (durable — central)
-- Specs, decisions, learnings live in the Cairn memory store at the `Memory:` path above, under this project's folder. This repo stays clean.
-- Every entry is tagged (frontmatter: project, type, slug, tags, status, date). Reuse tags before adding new ones.
+- Specs, decisions, learnings live in the Cairn memory store at the `Memory:` path above, under this project's folder (`specs/`, `specs/<slug>.plan.md`, `decisions/`, `learnings/`, plus an optional `rules.md` of standing project rules). This repo stays clean.
+- Every entry is tagged (frontmatter: project, type, slug, tags (max 5), status, date; specs add refs and scope). Reuse tags before adding new ones.
+- Spec status: draft -> active (plan written) -> complete (Review PASS) | superseded. Only /cairn:spec, /cairn:plan and /cairn:review move it.
 - Recall is automatic at Spec/Challenge (search memory first). Writes are approval-gated (AskUserQuestion confirms each entry).
 - Distill a learning at Complete. Plans are disposable; specs/decisions/learnings are durable.

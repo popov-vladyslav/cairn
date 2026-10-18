@@ -6,7 +6,7 @@ A lightweight, AI-native build loop for coding agents, packaged as a Claude Code
 Request → Spec → Challenge → Plan → Implement → Review → Complete
 ```
 
-Specs, decisions, and learnings are **durable memory**; plans are **disposable**. Memory is **central** — kept in the Cairn repo under `memory/<project>/` and tagged — so prior approaches get reused across projects instead of reinvented. The one gate that's never skipped is **Challenge** — the agent interrogates the request *before* planning, looking for hidden assumptions, simpler or already-existing solutions, and unnecessary complexity, so it solves the underlying problem instead of blindly building the literal ask.
+Specs, decisions, and learnings are **durable memory**; plans are **disposable**. Memory is **central** — kept in your Cairn clone under `memory/<project>/` and tagged — so prior approaches get reused across projects instead of reinvented. Project memory is **private by default**: `memory/<project>/` folders are gitignored, so this repo ships the loop, never your specs (see `CONTRIBUTING.md` to version yours). The one gate that's never skipped is **Challenge** — the agent interrogates the request *before* planning, looking for hidden assumptions, simpler or already-existing solutions, and unnecessary complexity, so it solves the underlying problem instead of blindly building the literal ask.
 
 Cairn is **teach-first**: by default the agent hands you a precise instruction (what / where / why + example) and reviews what you build; it writes code itself only for obvious small pieces you approve, delegating those — and independent review — to subagents with strict, minimal briefs.
 
@@ -34,8 +34,8 @@ Verify with `/plugin` or by typing `/cairn:` and seeing the commands. After edit
 | `/cairn:spec <slug> [request]` | Spec | Request → problem, goal, non-goals, acceptance criteria, saved to memory. Scaffolds the project's memory store + `AGENTS.md` on first run, recalls prior work, approval-gated. No solution. |
 | `/cairn:challenge <slug>` | Challenge | **Mandatory gate.** Interrogates the spec: assumptions, existing/simpler solutions (searches memory across projects), risks. Recommends proceed / revise / descope. |
 | `/cairn:plan <slug>` | Plan | Disposable plan: approach, affected files, checkbox steps, risks, rollback. Refuses if Challenge is unresolved. |
-| `/cairn:next <slug>` | Implement | Briefs the next unchecked step (teach-first); obvious small pieces go to a subagent on approval. Keeps the build green, ticks the box, commits, stops. |
-| `/cairn:review <slug>` | Review | A fresh, no-context subagent checks the diff against each acceptance criterion + the rules. PASS = Complete, else a fix list. |
+| `/cairn:next <slug>` | Implement | Briefs the next unchecked step (teach-first) or implements it (`Mode: agent-implements`); obvious small pieces go to a subagent on approval. Confirms any `[gate: …]` first. Keeps the build green, ticks the box, commits (or lists the change if `Git: owner`), stops. |
+| `/cairn:review <slug>` | Review | A fresh, no-context subagent checks the diff against each acceptance criterion (with the evidence `Verify:` demands) + the rules. PASS = ticks criteria, `status: complete`, `## Outcome`, plan pruned; else a fix list. |
 | `/cairn:learn <slug>` | Complete | Distills a reusable, tagged learning into memory. Approval-gated. |
 | `/cairn:decide <slug>` | — | Records a constraining choice as an append-only ADR in memory. Approval-gated. |
 | `/cairn:recall <query \| #tag>` | — | Searches memory (specs, decisions, learnings) by tag / project / keyword. Read-only. |
@@ -53,13 +53,25 @@ AGENTS.md                # operating manual + a `Memory:` path line (also read b
 In the **Cairn memory store** (`memory/<project>/`):
 
 ```
-specs/<slug>.md          # durable: request, problem, goal, non-goals, acceptance (+ Challenge, + inline Plan for small/medium work)
+specs/<slug>.md          # durable: request, problem, goal, non-goals, acceptance (+ Challenge, + inline Plan for small/medium work, + Outcome at PASS)
 specs/<slug>.plan.md     # disposable: the plan for large work (pruned at Complete)
 decisions/NNNN-*.md      # durable, append-only decision records
 learnings/<slug>.md      # distilled, reusable lessons from completed work
+rules.md                 # optional: standing project rules, one bullet per slug (read by spec/challenge/next/review/recall)
 ```
 
 Every entry is tagged; `/cairn:recall` and the automatic recall in Spec/Challenge use those tags to surface prior work.
+
+### Project settings
+
+Four optional lines directly under `Memory:` in the project's `AGENTS.md` tune the loop per project. Absent keys mean the defaults, which are today's behaviour.
+
+| Key | Values | Default | Effect |
+|---|---|---|---|
+| `Mode:` | `teach-first` \| `agent-implements` | `teach-first` | `agent-implements` makes `/cairn:next` implement steps directly instead of briefing you. |
+| `Git:` | `agent` \| `owner` | `agent` | `owner` means the agent never commits — `next`, `learn`, `decide`, `review` list changes and leave the commit to you. |
+| `Gates:` | one per line: `"<step kind> -> <condition>"` | none | `/cairn:plan` marks matching steps `[gate: <name>]`; `/cairn:next` asks for the condition before starting one. |
+| `Verify:` | one per line: `"<criterion scope> -> <evidence>"` | none | `/cairn:review` requires that evidence for criteria with a matching `(scope)` prefix; otherwise test / behaviour / file. |
 
 ## Loop in 15 seconds
 

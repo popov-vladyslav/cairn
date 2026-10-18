@@ -10,5 +10,6 @@ You are running `/cairn:learn` — capturing what's reusable from completed work
 1. Draft `<slug>.md` from `${CLAUDE_PLUGIN_ROOT}/templates/learning.md`: a one-line lesson, **What worked** (the approach/pattern, linked to the spec + any decision), **Reuse** (when to reach for it again), **Gotchas**. Fill the frontmatter (`project`, `type: learning`, `slug`, `tags`, `status: complete`, `date`). Reuse existing tags before adding new ones — check with `/cairn:recall`.
 2. **Approval gate.** Show the drafted learning + tags and ask with AskUserQuestion to confirm it's accurate and worth keeping. Only on approval, write `<memory>/<project>/learnings/<slug>.md`.
 3. If `<memory>/<project>/INDEX.md` exists, add the new entry under its tags.
+4. **Commit memory, per `Git:`** (the line directly under `Memory:` in this repo's `AGENTS.md`; default `agent`). If `Git:` is `owner`, do not commit — remind the owner to commit `memory/` in the Cairn repo. Otherwise commit the new file in the Cairn memory repo with a short message.
 
 Confirm the path written.

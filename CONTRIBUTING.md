@@ -7,7 +7,7 @@ Cairn is a declarative Claude Code plugin: all behavior lives in markdown
 
 - `commands/*.md` — the slash commands (`/cairn:spec`, `:challenge`, `:plan`, `:next`, `:review`, `:decide`, `:learn`, `:recall`). Each is a prompt with YAML frontmatter (`description`, `argument-hint`).
 - `skills/rules/SKILL.md` — the operating manual that auto-loads in a Cairn repo.
-- `templates/*.md` — scaffolding copied into user repos (`spec.md`, `plan.md`, `decision.md`, `learning.md`, `AGENTS.md`).
+- `templates/*.md` — scaffolding copied into user repos or memory (`spec.md`, `plan.md`, `decision.md`, `learning.md`, `rules.md`, `AGENTS.md`).
 - `memory/` — the central knowledge store, one folder per project. `memory/README.md` is a maintainer doc; project content (specs, decisions, learnings) is written here at runtime by the commands.
 - `.claude-plugin/` — `plugin.json` (the plugin manifest) and `marketplace.json` (single-plugin marketplace).
 
@@ -30,11 +30,26 @@ Cairn is a declarative Claude Code plugin: all behavior lives in markdown
     identical across `spec/challenge/plan/next/review/decide/learn/recall`.
   - **Writes are approval-gated; reads aren't.** `spec`, `decide`, and `learn` must AskUserQuestion
     before writing to memory; `recall` — and the automatic recall in `spec`/`challenge` — is read-only.
-- **Memory-path gotcha.** Memory is *data* and must live in the Cairn git repo so it versions and
+  - **Project settings keys are spelled identically everywhere.** The four keys under `Memory:` —
+    `Mode:`, `Git:`, `Gates:`, `Verify:` — appear with exactly that spelling in `templates/AGENTS.md`,
+    `skills/rules/SKILL.md` and every command that reads them (`next` reads `Mode:`/`Git:`/`Gates:`;
+    `plan` reads `Gates:`; `review` reads `Verify:`/`Git:`; `learn` and `decide` read `Git:`). Absent
+    keys must always mean the pre-settings default. Check with
+    `grep -n "Mode:\|Git:\|Gates:\|Verify:" templates/AGENTS.md skills/rules/SKILL.md commands/*.md`.
+  - **The status lifecycle is moved only by `spec`, `plan` and `review`.** `spec` writes `draft`,
+    `plan` sets `active`, `review` sets `complete` (and ticks criteria, appends `## Outcome`, prunes
+    the plan). No other command touches a spec's `status:`.
+  - **`rules.md` is read, never auto-written.** `spec`, `challenge`, `next`, `review` and `recall` read
+    `<memory>/<project>/rules.md` when present; it is created by hand from `templates/rules.md`.
+- **Memory-path gotcha.** Memory is *data* and should live in a git repo you control so it versions and
   persists. `/cairn:spec` defaults `<memory>` to `${CLAUDE_PLUGIN_ROOT}/memory` — correct for a
   *directory-source* install (the plugin root **is** the repo), but a copied/GitHub install makes
-  `${CLAUDE_PLUGIN_ROOT}` a throwaway copy. For those, set the `Memory:` line to your cairn repo's
+  `${CLAUDE_PLUGIN_ROOT}` a throwaway copy. For those, set the `Memory:` line to your cairn clone's
   `memory/<project>` path.
+- **Project memory is private by default.** `.gitignore` ignores every `memory/<project>/` folder, so a
+  public clone of this repo never ships anyone's specs. Only `memory/README.md` is tracked. To version
+  your own memory, remove the `memory/*/` line in your clone (or keep it and point `Memory:` at a
+  private repo). Never commit a `memory/<project>/` folder to the public repo.
 - **Don't put maintainer notes in `templates/`** — those files are copied verbatim into user repos.
   (`memory/README.md` is a maintainer doc and is *not* copied anywhere.)
 

@@ -22,6 +22,8 @@ Small work collapses several stages into a sentence each. The gate that is never
 ## Delegation & coding rules
 Cairn runs as an **orchestrator + subagents**. The main agent owns the full picture; subagents own slices.
 
+**Project settings.** The `Mode:`, `Git:`, `Gates:` and `Verify:` lines directly under `Memory:` in the project's `AGENTS.md` override the defaults below. `Mode: agent-implements` lets the agent implement plan steps directly; `Git: owner` means the agent never commits (it lists changed files + a suggested message); `Gates:` names step kinds that need a confirmed condition before they start; `Verify:` names the evidence that proves each criterion scope at Review. An absent key means the default (teach-first, agent commits, no gates, evidence = test / behaviour / file). Every command that reads a key names it with exactly this spelling.
+
 - **Teach first; don't code by default.** The main agent's normal output is an *instruction*, not a commit: what to change, where (file + location), why, and a copy-paste-ready example (a real snippet from this repo when one exists). You implement; the agent reviews. This keeps you in control and builds your understanding.
 - **Small pieces only.** Never take a big job at once. Split into the smallest steps that each leave the build green and stand on their own.
 - **Obvious small piece → ask, then delegate.** When a change is small and unambiguous, the agent asks with AskUserQuestion and, only once you approve, hands it to a subagent. (For these, skip the full teach-the-instruction detail.)
@@ -56,18 +58,20 @@ Cairn's durable memory is **central**, not per-repo. Specs, decisions, and learn
 ```
 <cairn>/memory/
   <project>/                 # e.g. renderers, zalando-app
-    specs/<slug>.md          # durable: problem, goal, non-goals, acceptance, Challenge
+    specs/<slug>.md          # durable: problem, goal, non-goals, acceptance, Challenge, Outcome
     specs/<slug>.plan.md     # disposable plan (large work); pruned at Complete
     decisions/NNNN-*.md      # durable, append-only ADRs
     learnings/<slug>.md      # distilled lessons from completed work
+    rules.md                 # optional: standing project rules, one bullet per slug (read by spec/challenge/next/recall)
     INDEX.md                 # optional: tag -> entry map
 ```
 
 - **Project** = the repo you're in (its folder name under `memory/`). The code repo stays clean — only its `AGENTS.md` carries the rules and the memory path.
-- **Tags.** Every entry has frontmatter: `project`, `type` (spec|decision|learning), `slug`, `tags: [..]`, `status`, `date`. Reuse existing tags before inventing new ones (`/cairn:recall` lists them).
+- **Tags.** Every entry has frontmatter: `project`, `type` (spec|decision|learning|plan|reference|rules), `slug`, `tags: [..]` (at most 5), `status`, `date`. Specs also carry `refs: []` (external references) and `scope: []` (platforms/areas, which go here rather than in tags). Reuse existing tags before inventing new ones (`/cairn:recall` lists them).
+- **Status lifecycle.** A spec is `draft` when written, `active` once its plan is written, `complete` at Review PASS (or `superseded`). Only `/cairn:spec`, `/cairn:plan` and `/cairn:review` move it.
 - **Recall is automatic.** At Spec and Challenge the agent searches memory (this project first, then others) for prior specs/decisions/learnings on the same tags, and reuses the existing approach instead of reinventing it.
 - **Writes are approval-gated.** Before saving anything to memory (spec, decision, learning), the agent shows the proposed entry + tags and asks with AskUserQuestion to confirm it's accurate and worth keeping. Nothing enters memory without your OK.
 - **Learn at Complete.** When work finishes, distill what's reusable — the approach that worked, gotchas, patterns — into `learnings/` (`/cairn:learn`). That is how memory gets smarter per job.
 - Plans are disposable; specs/decisions/learnings are durable. When implementation reveals the spec was wrong, update the spec in the same change. Chat deliberation and restated code aren't memory — only durable, reusable artifacts belong here.
 
-The memory store lives in the Cairn git repo and is found via the absolute `Memory:` path in each project's `AGENTS.md`.
+The memory store lives in your Cairn clone (project folders under `memory/` are gitignored by default — remove that ignore, or point `Memory:` at a private repo, to version them) and is found via the absolute `Memory:` path in each project's `AGENTS.md`.

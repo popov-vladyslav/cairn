@@ -20,8 +20,11 @@ Include:
 - **Affected files** — each path and what changes (mark new files).
 - **Risks** — risk → mitigation.
 - **Steps** — ordered checkboxes, each small enough to leave the build green on its own. Each step is an instruction you'll implement (teach-first); mark steps that are *obvious small pieces* a subagent could do on approval.
+- **Gates** — read the `Gates:` line(s) directly under `Memory:` in this repo's `AGENTS.md` (each `"<step kind> -> <condition>"`). Mark every step whose kind matches a gate with `[gate: <name>]`, where `<name>` is that gate's step kind; `/cairn:next` asks for the condition before starting such a step. No `Gates:` line → no markers.
 - **Rollback** — how to undo cleanly; note any state left behind.
 
 Keep it concise. The plan is disposable — it gets pruned at Complete.
+
+When the plan is written, set the spec's frontmatter `status: active` (the plan is now the work in flight).
 
 Next: `/cairn:next <feature-slug>` to implement step 1.
