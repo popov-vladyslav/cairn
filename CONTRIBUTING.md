@@ -27,7 +27,8 @@ Cairn is a declarative Claude Code plugin: all behavior lives in markdown
     `<memory>/<project>/specs/<slug>.plan.md` (large). `plan.md` writes it; `next.md` and `review.md`
     both read it; `review.md` prunes it. Change one, check all four.
   - **Step markers agree.** `plan.md` writes `[gate: <name>]` and `[large]` on steps (shown in
-    `templates/plan.md`); `next.md` reads them. `[large]` selects the implementer's model (opus) and is
+    `templates/plan.md`); `next.md` reads them. One step may carry both (e.g. a migration:
+    `[gate: <name>] [large]`). `[large]` selects the implementer's model (opus) and is
     also the per-step flag that `next.md`'s "Large blast-radius … wasn't flagged as such" pause refers to.
   - **Memory paths agree.** Every command resolves `<memory>` = the `Memory:` line in the repo's
     `AGENTS.md` (set by `/cairn:spec`) and `<project>` = the repo folder name. Keep that convention

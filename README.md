@@ -93,9 +93,9 @@ Opus thinks, Sonnet types. The plugin ships two agents (`agents/`), each with a 
 - **Large blast-radius steps run on opus.** `/cairn:plan` marks Large blast-radius steps (shared utils, data shape, public API, auth, payments, migrations, deletes) `[large]`, and `/cairn:next` spawns the implementer on opus for them up front, not after a failed review. Small/medium steps stay on sonnet.
 - **Override per project** with a `Models:` line under `Memory:` in the project's `AGENTS.md`, one entry per line:
   ```text
-  Models: implementer -> opus
+  Models: "implementer -> opus"
   ```
-  Accepted values are `sonnet`, `opus`, `haiku` and `fable` (the aliases the Agent tool's `model` parameter takes). An entry wins over the two opus rules, which only replace the sonnet default, so `implementer -> fable` is never downgraded. Absent means the defaults above. Claude Code lists the agents as `cairn:cairn-implementer` and `cairn:cairn-reviewer` (see `/agents`).
+  Accepted values are `sonnet`, `opus`, `haiku` and `fable` (the aliases the Agent tool's `model` parameter takes). An entry wins over the two opus rules, which only replace the sonnet default, so `"implementer -> fable"` is never downgraded. Absent means the defaults above. Claude Code lists the agents as `cairn:cairn-implementer` and `cairn:cairn-reviewer` (see `/agents`).
 
 **Session model.** The main agent runs on whatever model your session uses — e.g. Opus day to day, Fable 5.1 for important work. Subagent models are fixed by the agents' frontmatter and are not affected by the session model; apart from the two opus rules above, only the `Models:` key in `AGENTS.md` overrides them.
 

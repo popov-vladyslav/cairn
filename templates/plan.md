@@ -14,6 +14,7 @@ The chosen path in 2-3 sentences. Why this over the obvious alternative.
 - [ ] 1. ...
 - [ ] 2. [gate: <name>] ... (a step whose kind matches a `Gates:` entry in AGENTS.md; /cairn:next confirms the gate's condition before starting it)
 - [ ] 3. [large] ... (a Large blast-radius step; /cairn:next runs its implementer on opus)
+- [ ] 4. [gate: <name>] [large] ... (a step can carry both markers, e.g. a migration: /cairn:next confirms the gate first, then runs the implementer on opus)
 
 ### Rollback
 How to undo cleanly (revert which files / flags; is any state left behind?).

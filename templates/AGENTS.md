@@ -42,7 +42,7 @@ Project settings: the `Mode:`, `Git:`, `Gates:`, `Verify:` and `Models:` lines u
 
 - **Review-failed rework runs on opus.** When `/cairn:next` re-implements a step because `/cairn:review` returned a fix list for it, spawn `cairn-implementer` with the Agent tool's `model: opus` override instead of retrying on sonnet.
 - **Large blast-radius steps run on opus.** When the plan step being implemented is marked `[large]` (Large per the Blast-radius rules: shared utils, data shape, public API, auth, payments, migrations, deletes), `/cairn:next` spawns `cairn-implementer` with the Agent tool's `model: opus` override up front, not after a failed review. Small/medium steps stay on sonnet.
-- **Per-project override.** A `Models:` entry in the project's `AGENTS.md` (`implementer -> <model>` read by `/cairn:next`, `reviewer -> <model>` read by `/cairn:review`) is passed as the Agent tool's `model` override. Accepted values: `sonnet`, `opus`, `haiku`, `fable`. An entry wins over the two opus rules above, which only replace the sonnet default. An absent key means the defaults above.
+- **Per-project override.** A `Models:` entry in the project's `AGENTS.md` (`"implementer -> <model>"` read by `/cairn:next`, `"reviewer -> <model>"` read by `/cairn:review`) is passed as the Agent tool's `model` override. Accepted values: `sonnet`, `opus`, `haiku`, `fable`. An entry wins over the two opus rules above, which only replace the sonnet default. An absent key means the defaults above.
 
 ## Review rules
 - Re-read the spec's acceptance criteria; check the diff against each, one by one.
