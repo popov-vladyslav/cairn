@@ -20,6 +20,6 @@ You are running the **Review** stage of the Cairn loop. Review the whole change 
      5. List the spec's `refs:` entries (external issues / tracker items) as **"close externally"** — the plugin does not close them.
      6. If `Git:` is `owner`, remind the owner to commit `memory/`.
      Then run `/cairn:learn <slug>` to capture what's reusable, and if any choice now constrains future work, `/cairn:decide <slug>`.
-   - **Otherwise**, list the specific fixes needed and point back to `/cairn:next`. The fix list is rework, and rework runs on opus (per Model routing).
+   - **Otherwise**, list the specific fixes needed and point back to `/cairn:next`. The fix list is rework: if `cairn:cairn-implementer` does it, it runs on opus (per Model routing).
 
 Be concrete. "Seems right" is not a pass — name the evidence for each criterion.

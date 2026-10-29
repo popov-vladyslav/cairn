@@ -77,7 +77,7 @@ Five optional lines directly under `Memory:` in the project's `AGENTS.md` tune t
 | `Git:` | `agent` \| `owner` | `agent` | `owner` means the agent never commits — `next`, `learn`, `decide`, `review` list changes and leave the commit to you. |
 | `Gates:` | one per line: `"<step kind> -> <condition>"` | none | `/cairn:plan` marks matching steps `[gate: <name>]`; `/cairn:next` asks for the condition before starting one. |
 | `Verify:` | one per line: `"<criterion scope> -> <evidence>"` | none | `/cairn:review` requires that evidence for criteria with a matching `(scope)` prefix; otherwise test / behaviour / file. |
-| `Models:` | one per line: `"<agent> -> <model>"`, e.g. `"implementer -> opus"` | the Model routing defaults | `/cairn:next` passes the `implementer` entry and `/cairn:review` the `reviewer` entry as the subagent's model override. |
+| `Models:` | one per line: `"<agent> -> <model>"`, e.g. `"implementer -> opus"` | the Model routing defaults | `/cairn:next` passes the `implementer` entry and `/cairn:review` the `reviewer` entry as the subagent's model override. Review-failed rework still runs on opus. |
 
 ## Model routing
 
@@ -89,7 +89,7 @@ Opus thinks, Sonnet types. The plugin ships two agents (`agents/`), each with a 
 | Implement a plan step from an approved plan (patch, tests) | `cairn-implementer` | sonnet |
 | Review (fresh, no-context) | `cairn-reviewer` | opus |
 
-- **Review-failed rework runs on opus.** When `/cairn:next` re-implements a step because `/cairn:review` returned a fix list for it, the implementer is spawned on opus instead of retrying on sonnet.
+- **Review-failed rework runs on opus.** When `/cairn:next` re-implements a step because `/cairn:review` returned a fix list for it, the implementer is spawned on opus instead of retrying on sonnet, even if `Models:` names another model for it.
 - **Override per project** with a `Models:` line under `Memory:` in the project's `AGENTS.md`, one entry per line:
   ```text
   Models: implementer -> opus

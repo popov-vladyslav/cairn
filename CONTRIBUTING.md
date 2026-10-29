@@ -43,7 +43,8 @@ Cairn is a declarative Claude Code plugin: all behavior lives in markdown
   - **Agents never use `model: inherit`.** Each file in `agents/` pins `sonnet` or `opus`. Routing (the
     table, the review-failed-rework-on-opus rule, `Models:` semantics) lives in `skills/rules/SKILL.md`
     `## Model routing` and `templates/AGENTS.md` `## Model routing` — keep both in sync, and keep
-    `next.md` / `review.md` naming the agents as `/agents` shows them.
+    `next.md` / `review.md` naming the agents as `/agents` shows them. `agents/cairn-reviewer.md` restates
+    `review.md` step 2 (the evidence-per-criterion bullet and the rules list); change one, change both.
   - **`rules.md` is read, never auto-written.** `spec`, `challenge`, `next`, `review` and `recall` read
     `<memory>/<project>/rules.md` when present; it is created by hand from `templates/rules.md`.
 - **Memory-path gotcha.** Memory is *data* and should live in a git repo you control so it versions and
