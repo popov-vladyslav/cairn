@@ -19,7 +19,7 @@ Include:
 - **Approach** — the chosen path in 2–3 sentences, and why it beats the obvious alternative.
 - **Affected files** — each path and what changes (mark new files).
 - **Risks** — risk → mitigation.
-- **Steps** — ordered checkboxes, each small enough to leave the build green on its own. Each step is an instruction you'll implement (teach-first); mark steps that are *obvious small pieces* a subagent could do on approval.
+- **Steps** — ordered checkboxes, each small enough to leave the build green on its own. Each step is an instruction you'll implement (teach-first); mark steps that are *obvious small pieces* a subagent could do on approval, and mark every Large blast-radius step (shared utils, data shape, public API, auth, payments, migrations, deletes) with `[large]` so `/cairn:next` sees it without re-deriving the blast radius (a step may carry both `[gate: <name>]` and `[large]`, e.g. a migration).
 - **Gates** — read the `Gates:` line(s) directly under `Memory:` in this repo's `AGENTS.md` (each `"<step kind> -> <condition>"`). Mark every step whose kind matches a gate with `[gate: <name>]`, where `<name>` is that gate's step kind; `/cairn:next` asks for the condition before starting such a step. No `Gates:` line → no markers.
 - **Rollback** — how to undo cleanly; note any state left behind.
 

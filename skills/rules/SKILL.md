@@ -22,7 +22,7 @@ Small work collapses several stages into a sentence each. The gate that is never
 ## Delegation & coding rules
 Cairn runs as an **orchestrator + subagents**. The main agent owns the full picture; subagents own slices.
 
-**Project settings.** The `Mode:`, `Git:`, `Gates:` and `Verify:` lines directly under `Memory:` in the project's `AGENTS.md` override the defaults below. `Mode: agent-implements` lets the agent implement plan steps directly; `Git: owner` means the agent never commits (it lists changed files + a suggested message); `Gates:` names step kinds that need a confirmed condition before they start; `Verify:` names the evidence that proves each criterion scope at Review. An absent key means the default (teach-first, agent commits, no gates, evidence = test / behaviour / file). Every command that reads a key names it with exactly this spelling.
+**Project settings.** The `Mode:`, `Git:`, `Gates:`, `Verify:` and `Models:` lines directly under `Memory:` in the project's `AGENTS.md` override the defaults below. `Mode: agent-implements` lets the agent implement plan steps directly; `Git: owner` means the agent never commits (it lists changed files + a suggested message); `Gates:` names step kinds that need a confirmed condition before they start; `Verify:` names the evidence that proves each criterion scope at Review; `Models:` overrides a subagent's model (one per line, `"<agent> -> <model>"`, e.g. `"implementer -> opus"`; see `## Model routing`). An absent key means the default (teach-first, agent commits, no gates, evidence = test / behaviour / file, the Model routing defaults). Every command that reads a key names it with exactly this spelling.
 
 - **Teach first; don't code by default.** The main agent's normal output is an *instruction*, not a commit: what to change, where (file + location), why, and a copy-paste-ready example (a real snippet from this repo when one exists). You implement; the agent reviews. This keeps you in control and builds your understanding.
 - **Small pieces only.** Never take a big job at once. Split into the smallest steps that each leave the build green and stand on their own.
@@ -35,6 +35,21 @@ Cairn runs as an **orchestrator + subagents**. The main agent owns the full pict
 - No new dependency without a one-line justification (and a decision record if it's load-bearing).
 - Smallest change that satisfies the acceptance criteria. No speculative abstraction.
 - Leave the build green: typecheck, lint, and tests pass before you stop.
+
+## Model routing
+Opus thinks, Sonnet types. The two subagents carry a fixed model, so routing holds whatever model the main session runs on.
+
+| Work | Who | Model |
+|---|---|---|
+| Spec / Challenge / Plan authoring, talking to the user, memory writes | main agent | session model (run the session on opus for best results) |
+| Implement a plan step from an approved plan (patch, tests) | `cairn-implementer` | sonnet |
+| Review (fresh, no-context) | `cairn-reviewer` | opus |
+
+- **Review-failed rework runs on opus.** When `/cairn:next` re-implements a step because `/cairn:review` returned a fix list for it, spawn `cairn-implementer` with the Agent tool's `model: opus` override instead of retrying on sonnet.
+- **Large blast-radius steps run on opus.** When the plan step being implemented is marked `[large]` (Large per the Blast-radius rules: shared utils, data shape, public API, auth, payments, migrations, deletes), `/cairn:next` spawns `cairn-implementer` with the Agent tool's `model: opus` override up front, not after a failed review. Small/medium steps stay on sonnet.
+- **Per-project override.** A `Models:` entry in the project's `AGENTS.md` (`"implementer -> <model>"` read by `/cairn:next`, `"reviewer -> <model>"` read by `/cairn:review`) is passed as the Agent tool's `model` override. Accepted values: `sonnet`, `opus`, `haiku`, `fable`. An entry wins over the two opus rules above, which only replace the sonnet default. An absent key means the defaults above.
+
+**Session model.** The main agent runs on whatever model the session uses — e.g. Opus day to day, Fable 5.1 for important work. Subagent models are fixed by the agents' frontmatter and are not affected by the session model; apart from the two opus rules above, only the `Models:` key in `AGENTS.md` overrides them.
 
 ## Review rules
 - Re-read the spec's acceptance criteria; check the diff against each, one by one.
