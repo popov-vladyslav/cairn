@@ -8,7 +8,7 @@ Request → Spec → Challenge → Plan → Implement → Review → Complete
 
 Specs, decisions, and learnings are **durable memory**; plans are **disposable**. Memory is **central** — kept in your Cairn clone under `memory/<project>/` and tagged — so prior approaches get reused across projects instead of reinvented. `memory/<project>/` folders are gitignored: this repo ships the loop, and your specs stay on your machine. The one gate that's never skipped is **Challenge** — the agent interrogates the request *before* planning, looking for hidden assumptions, simpler or already-existing solutions, and unnecessary complexity, so it solves the underlying problem instead of blindly building the literal ask.
 
-Cairn is **teach-first**: by default the agent hands you a precise instruction (what / where / why + example) and reviews what you build; it writes code itself only for obvious small pieces you approve, delegating those — and independent review — to subagents with strict, minimal briefs.
+Cairn is **teach-first**: by default the agent hands you a precise instruction (what / where / why + example) and reviews what you build; it writes code itself only for obvious small pieces you approve, delegating those to the `cairn-implementer` agent (sonnet) and independent review to the `cairn-reviewer` agent (opus), each with a strict, minimal brief.
 
 ## Install
 
@@ -39,8 +39,8 @@ Verify with `/plugin` or by typing `/cairn:` and seeing the commands. After edit
 | `/cairn:spec <slug> [request]` | Spec | Request → problem, goal, non-goals, acceptance criteria, saved to memory. Scaffolds the project's memory store + `AGENTS.md` on first run, recalls prior work, approval-gated. No solution. |
 | `/cairn:challenge <slug>` | Challenge | **Mandatory gate.** Interrogates the spec: assumptions, existing/simpler solutions (searches memory across projects), risks. Recommends proceed / revise / descope. |
 | `/cairn:plan <slug>` | Plan | Disposable plan: approach, affected files, checkbox steps, risks, rollback. Refuses if Challenge is unresolved. |
-| `/cairn:next <slug>` | Implement | Briefs the next unchecked step (teach-first) or implements it (`Mode: agent-implements`); obvious small pieces go to a subagent on approval. Confirms any `[gate: …]` first. Keeps the build green, ticks the box, commits (or lists the change if `Git: owner`), stops. |
-| `/cairn:review <slug>` | Review | A fresh, no-context subagent checks the diff against each acceptance criterion (with the evidence `Verify:` demands) + the rules. PASS = ticks criteria, `status: complete`, `## Outcome`, plan pruned; else a fix list. |
+| `/cairn:next <slug>` | Implement | Briefs the next unchecked step (teach-first) or implements it (`Mode: agent-implements`); obvious small pieces go to the `cairn-implementer` agent (sonnet) on approval. Confirms any `[gate: …]` first. Keeps the build green, ticks the box, commits (or lists the change if `Git: owner`), stops. |
+| `/cairn:review <slug>` | Review | The fresh, no-context `cairn-reviewer` agent (opus) checks the diff against each acceptance criterion (with the evidence `Verify:` demands) + the rules. PASS = ticks criteria, `status: complete`, `## Outcome`, plan pruned; else a fix list. |
 | `/cairn:learn <slug>` | Complete | Distills a reusable, tagged learning into memory. Approval-gated. |
 | `/cairn:decide <slug>` | — | Records a constraining choice as an append-only ADR in memory. Approval-gated. |
 | `/cairn:recall <query \| #tag>` | — | Searches memory (specs, decisions, learnings) by tag / project / keyword. Read-only. |
@@ -69,7 +69,7 @@ Every entry is tagged; `/cairn:recall` and the automatic recall in Spec/Challeng
 
 ### Project settings
 
-Four optional lines directly under `Memory:` in the project's `AGENTS.md` tune the loop per project. Absent keys mean the defaults, which are today's behaviour.
+Five optional lines directly under `Memory:` in the project's `AGENTS.md` tune the loop per project. Absent keys mean the defaults, which are today's behaviour.
 
 | Key | Values | Default | Effect |
 |---|---|---|---|
@@ -77,6 +77,24 @@ Four optional lines directly under `Memory:` in the project's `AGENTS.md` tune t
 | `Git:` | `agent` \| `owner` | `agent` | `owner` means the agent never commits — `next`, `learn`, `decide`, `review` list changes and leave the commit to you. |
 | `Gates:` | one per line: `"<step kind> -> <condition>"` | none | `/cairn:plan` marks matching steps `[gate: <name>]`; `/cairn:next` asks for the condition before starting one. |
 | `Verify:` | one per line: `"<criterion scope> -> <evidence>"` | none | `/cairn:review` requires that evidence for criteria with a matching `(scope)` prefix; otherwise test / behaviour / file. |
+| `Models:` | one per line: `"<agent> -> <model>"`, e.g. `"implementer -> opus"` | the Model routing defaults | `/cairn:next` passes the `implementer` entry and `/cairn:review` the `reviewer` entry as the subagent's model override. |
+
+## Model routing
+
+Opus thinks, Sonnet types. The plugin ships two agents (`agents/`), each with a fixed model, so routing holds whatever model your session runs on.
+
+| Work | Who | Model |
+|---|---|---|
+| Spec / Challenge / Plan authoring, talking to you, memory writes | main agent | your session model (run the session on opus for best results) |
+| Implement a plan step from an approved plan (patch, tests) | `cairn-implementer` | sonnet |
+| Review (fresh, no-context) | `cairn-reviewer` | opus |
+
+- **Review-failed rework runs on opus.** When `/cairn:next` re-implements a step because `/cairn:review` returned a fix list for it, the implementer is spawned on opus instead of retrying on sonnet.
+- **Override per project** with a `Models:` line under `Memory:` in the project's `AGENTS.md`, one entry per line:
+  ```text
+  Models: implementer -> opus
+  ```
+  Absent means the defaults above. Claude Code lists the agents as `cairn:cairn-implementer` and `cairn:cairn-reviewer` (see `/agents`).
 
 ## Loop in 15 seconds
 

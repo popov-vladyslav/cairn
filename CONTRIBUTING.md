@@ -1,11 +1,12 @@
 # Contributing to Cairn
 
 Cairn is a declarative Claude Code plugin: all behavior lives in markdown
-(`commands/`, `skills/`, `templates/`) — there is no build step and no runtime code.
+(`commands/`, `agents/`, `skills/`, `templates/`) — there is no build step and no runtime code.
 
 ## Layout
 
 - `commands/*.md` — the slash commands (`/cairn:spec`, `:challenge`, `:plan`, `:next`, `:review`, `:decide`, `:learn`, `:recall`). Each is a prompt with YAML frontmatter (`description`, `argument-hint`).
+- `agents/*.md` — the two subagents, `cairn-implementer` (sonnet, spawned by `next`) and `cairn-reviewer` (opus, spawned by `review`), exposed as `cairn:cairn-implementer` / `cairn:cairn-reviewer`. Frontmatter is `name`, `description`, `model` only.
 - `skills/rules/SKILL.md` — the operating manual that auto-loads in a Cairn repo.
 - `templates/*.md` — scaffolding copied into user repos or memory (`spec.md`, `plan.md`, `decision.md`, `learning.md`, `rules.md`, `AGENTS.md`).
 - `memory/` — the central knowledge store, one folder per project. `memory/README.md` is a maintainer doc; project content (specs, decisions, learnings) is written here at runtime by the commands.
@@ -30,15 +31,19 @@ Cairn is a declarative Claude Code plugin: all behavior lives in markdown
     identical across `spec/challenge/plan/next/review/decide/learn/recall`.
   - **Writes are approval-gated; reads aren't.** `spec`, `decide`, and `learn` must AskUserQuestion
     before writing to memory; `recall` — and the automatic recall in `spec`/`challenge` — is read-only.
-  - **Project settings keys are spelled identically everywhere.** The four keys under `Memory:` —
-    `Mode:`, `Git:`, `Gates:`, `Verify:` — appear with exactly that spelling in `templates/AGENTS.md`,
-    `skills/rules/SKILL.md` and every command that reads them (`next` reads `Mode:`/`Git:`/`Gates:`;
-    `plan` reads `Gates:`; `review` reads `Verify:`/`Git:`; `learn` and `decide` read `Git:`). Absent
+  - **Project settings keys are spelled identically everywhere.** The five keys under `Memory:` —
+    `Mode:`, `Git:`, `Gates:`, `Verify:`, `Models:` — appear with exactly that spelling in `templates/AGENTS.md`,
+    `skills/rules/SKILL.md` and every command that reads them (`next` reads `Mode:`/`Git:`/`Gates:`/`Models:`;
+    `plan` reads `Gates:`; `review` reads `Verify:`/`Git:`/`Models:`; `learn` and `decide` read `Git:`). Absent
     keys must always mean the pre-settings default. Check with
-    `grep -n "Mode:\|Git:\|Gates:\|Verify:" templates/AGENTS.md skills/rules/SKILL.md commands/*.md`.
+    `grep -n "Mode:\|Git:\|Gates:\|Verify:\|Models:" templates/AGENTS.md skills/rules/SKILL.md commands/*.md`.
   - **The status lifecycle is moved only by `spec`, `plan` and `review`.** `spec` writes `draft`,
     `plan` sets `active`, `review` sets `complete` (and ticks criteria, appends `## Outcome`, prunes
     the plan). No other command touches a spec's `status:`.
+  - **Agents never use `model: inherit`.** Each file in `agents/` pins `sonnet` or `opus`. Routing (the
+    table, the review-failed-rework-on-opus rule, `Models:` semantics) lives in `skills/rules/SKILL.md`
+    `## Model routing` and `templates/AGENTS.md` `## Model routing` — keep both in sync, and keep
+    `next.md` / `review.md` naming the agents as `/agents` shows them.
   - **`rules.md` is read, never auto-written.** `spec`, `challenge`, `next`, `review` and `recall` read
     `<memory>/<project>/rules.md` when present; it is created by hand from `templates/rules.md`.
 - **Memory-path gotcha.** Memory is *data* and should live in a git repo you control so it versions and
