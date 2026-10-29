@@ -13,4 +13,4 @@ All notable changes to Cairn are documented here. The format follows
 - `[large]` step marker: `/cairn:plan` marks Large blast-radius steps so `/cairn:next` can route them to opus without re-deriving the blast radius.
 
 ### Changed
-- `/cairn:next` hands its brief to `cairn:cairn-implementer` and `/cairn:review` spawns `cairn:cairn-reviewer` instead of a generic subagent. No behaviour change other than model selection: same command prompts, approval gates, hand-offs and briefs. The agent files carry only a role preamble that restates the existing delegation and review rules.
+- `/cairn:next` hands its brief to `cairn:cairn-implementer` and `/cairn:review` spawns `cairn:cairn-reviewer` instead of a generic subagent. No behaviour change other than model selection: same command prompts, approval gates, hand-offs and briefs. The agent files carry a role preamble that restates the existing delegation and review rules and the orchestrator's existing division of labour (the implementer does not commit, tick plan boxes or write memory; the reviewer writes nothing).

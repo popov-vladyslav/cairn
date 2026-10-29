@@ -27,7 +27,8 @@ Cairn is a declarative Claude Code plugin: all behavior lives in markdown
     `<memory>/<project>/specs/<slug>.plan.md` (large). `plan.md` writes it; `next.md` and `review.md`
     both read it; `review.md` prunes it. Change one, check all four.
   - **Step markers agree.** `plan.md` writes `[gate: <name>]` and `[large]` on steps (shown in
-    `templates/plan.md`); `next.md` reads them. `[large]` only selects the implementer's model.
+    `templates/plan.md`); `next.md` reads them. `[large]` selects the implementer's model (opus) and is
+    also the per-step flag that `next.md`'s "Large blast-radius … wasn't flagged as such" pause refers to.
   - **Memory paths agree.** Every command resolves `<memory>` = the `Memory:` line in the repo's
     `AGENTS.md` (set by `/cairn:spec`) and `<project>` = the repo folder name. Keep that convention
     identical across `spec/challenge/plan/next/review/decide/learn/recall`.
@@ -43,8 +44,9 @@ Cairn is a declarative Claude Code plugin: all behavior lives in markdown
     `plan` sets `active`, `review` sets `complete` (and ticks criteria, appends `## Outcome`, prunes
     the plan). No other command touches a spec's `status:`.
   - **Agents never use `model: inherit`.** Each file in `agents/` pins `sonnet` or `opus`. Routing (the
-    table, the review-failed-rework-on-opus rule, `Models:` semantics) lives in `skills/rules/SKILL.md`
-    `## Model routing` and `templates/AGENTS.md` `## Model routing` — keep both in sync, and keep
+    table, the review-failed-rework-on-opus rule, the `[large]`-on-opus rule, `Models:` semantics) lives in `skills/rules/SKILL.md`
+    `## Model routing` and `templates/AGENTS.md` `## Model routing` — keep both in sync (the "Opus thinks, Sonnet types" intro and the Session-model
+    paragraph are SKILL.md/README-only), and keep
     `next.md` / `review.md` naming the agents as `/agents` shows them. `agents/cairn-reviewer.md` restates
     `review.md` step 2 (the evidence-per-criterion bullet and the rules list); change one, change both.
   - **`rules.md` is read, never auto-written.** `spec`, `challenge`, `next`, `review` and `recall` read
