@@ -26,6 +26,8 @@ Cairn is a declarative Claude Code plugin: all behavior lives in markdown
   - The plan lives in the `## Plan` section of the spec (small/medium) **or** a sibling
     `<memory>/<project>/specs/<slug>.plan.md` (large). `plan.md` writes it; `next.md` and `review.md`
     both read it; `review.md` prunes it. Change one, check all four.
+  - **Step markers agree.** `plan.md` writes `[gate: <name>]` and `[large]` on steps (shown in
+    `templates/plan.md`); `next.md` reads them. `[large]` only selects the implementer's model.
   - **Memory paths agree.** Every command resolves `<memory>` = the `Memory:` line in the repo's
     `AGENTS.md` (set by `/cairn:spec`) and `<project>` = the repo folder name. Keep that convention
     identical across `spec/challenge/plan/next/review/decide/learn/recall`.

@@ -45,8 +45,11 @@ Opus thinks, Sonnet types. The two subagents carry a fixed model, so routing hol
 | Implement a plan step from an approved plan (patch, tests) | `cairn-implementer` | sonnet |
 | Review (fresh, no-context) | `cairn-reviewer` | opus |
 
-- **Review-failed rework runs on opus.** When `/cairn:next` re-implements a step because `/cairn:review` returned a fix list for it, spawn `cairn-implementer` with `model: opus` (the Agent tool's `model` parameter) instead of retrying on sonnet. This overrides any `Models:` entry.
-- **Per-project override.** A `Models:` entry in the project's `AGENTS.md` (`implementer -> <model>` read by `/cairn:next`, `reviewer -> <model>` read by `/cairn:review`) is passed as the Agent tool's `model` override. An absent key means the defaults above.
+- **Review-failed rework runs on opus.** When `/cairn:next` re-implements a step because `/cairn:review` returned a fix list for it, spawn `cairn-implementer` with the Agent tool's `model: opus` override instead of retrying on sonnet.
+- **Large blast-radius steps run on opus.** When the plan step being implemented is marked `[large]` (Large per the Blast-radius rules: shared utils, data shape, public API, auth, payments, migrations, deletes), `/cairn:next` spawns `cairn-implementer` with the Agent tool's `model: opus` override up front, not after a failed review. Small/medium steps stay on sonnet.
+- **Per-project override.** A `Models:` entry in the project's `AGENTS.md` (`implementer -> <model>` read by `/cairn:next`, `reviewer -> <model>` read by `/cairn:review`) is passed as the Agent tool's `model` override. Accepted values: `sonnet`, `opus`, `haiku`, `fable`. An entry wins over the two opus rules above, which only replace the sonnet default. An absent key means the defaults above.
+
+**Session model.** The main agent runs on whatever model the session uses — e.g. Opus day to day, Fable 5.1 for important work. Subagent models are fixed by the agents' frontmatter and are not affected by the session model; apart from the two opus rules above, only the `Models:` key in `AGENTS.md` overrides them.
 
 ## Review rules
 - Re-read the spec's acceptance criteria; check the diff against each, one by one.

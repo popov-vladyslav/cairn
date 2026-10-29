@@ -77,7 +77,7 @@ Five optional lines directly under `Memory:` in the project's `AGENTS.md` tune t
 | `Git:` | `agent` \| `owner` | `agent` | `owner` means the agent never commits — `next`, `learn`, `decide`, `review` list changes and leave the commit to you. |
 | `Gates:` | one per line: `"<step kind> -> <condition>"` | none | `/cairn:plan` marks matching steps `[gate: <name>]`; `/cairn:next` asks for the condition before starting one. |
 | `Verify:` | one per line: `"<criterion scope> -> <evidence>"` | none | `/cairn:review` requires that evidence for criteria with a matching `(scope)` prefix; otherwise test / behaviour / file. |
-| `Models:` | one per line: `"<agent> -> <model>"`, e.g. `"implementer -> opus"` | the Model routing defaults | `/cairn:next` passes the `implementer` entry and `/cairn:review` the `reviewer` entry as the subagent's model override. Review-failed rework still runs on opus. |
+| `Models:` | one per line: `"<agent> -> <model>"`, e.g. `"implementer -> opus"` | the Model routing defaults | `/cairn:next` passes the `implementer` entry and `/cairn:review` the `reviewer` entry as the subagent's model override. Accepted values: `sonnet`, `opus`, `haiku`, `fable`. An entry wins over the opus rules for rework and `[large]` steps. |
 
 ## Model routing
 
@@ -89,12 +89,15 @@ Opus thinks, Sonnet types. The plugin ships two agents (`agents/`), each with a 
 | Implement a plan step from an approved plan (patch, tests) | `cairn-implementer` | sonnet |
 | Review (fresh, no-context) | `cairn-reviewer` | opus |
 
-- **Review-failed rework runs on opus.** When `/cairn:next` re-implements a step because `/cairn:review` returned a fix list for it, the implementer is spawned on opus instead of retrying on sonnet, even if `Models:` names another model for it.
+- **Review-failed rework runs on opus.** When `/cairn:next` re-implements a step because `/cairn:review` returned a fix list for it, the implementer is spawned on opus instead of retrying on sonnet.
+- **Large blast-radius steps run on opus.** `/cairn:plan` marks Large blast-radius steps (shared utils, data shape, public API, auth, payments, migrations, deletes) `[large]`, and `/cairn:next` spawns the implementer on opus for them up front, not after a failed review. Small/medium steps stay on sonnet.
 - **Override per project** with a `Models:` line under `Memory:` in the project's `AGENTS.md`, one entry per line:
   ```text
   Models: implementer -> opus
   ```
-  Absent means the defaults above. Claude Code lists the agents as `cairn:cairn-implementer` and `cairn:cairn-reviewer` (see `/agents`).
+  Accepted values are `sonnet`, `opus`, `haiku` and `fable` (the aliases the Agent tool's `model` parameter takes). An entry wins over the two opus rules, which only replace the sonnet default, so `implementer -> fable` is never downgraded. Absent means the defaults above. Claude Code lists the agents as `cairn:cairn-implementer` and `cairn:cairn-reviewer` (see `/agents`).
+
+**Session model.** The main agent runs on whatever model your session uses — e.g. Opus day to day, Fable 5.1 for important work. Subagent models are fixed by the agents' frontmatter and are not affected by the session model; apart from the two opus rules above, only the `Models:` key in `AGENTS.md` overrides them.
 
 ## Loop in 15 seconds
 
